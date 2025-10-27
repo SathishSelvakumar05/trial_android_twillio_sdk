@@ -1,6 +1,4 @@
 
-import 'twillio_android_platform_interface.dart';
-
 import 'package:flutter/services.dart';
 
 class TwillioSDK {

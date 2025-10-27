@@ -1,3 +1,10 @@
-## 0.0.1
+## 1.0.0
 
-* TODO: Describe initial release.
+🎉 Initial release of **twillio_android**
+
+- Native Android integration with Twilio Video SDK
+- Connect and disconnect from rooms
+- Local and remote video rendering
+- Audio/video mute/unmute
+- Switch camera
+- Event stream for participant actions
