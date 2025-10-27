@@ -1,1 +1,24 @@
-TODO: Add your license here.
+
+---
+
+## 🗒️ **CHANGELOG.md**
+
+```markdown
+# 📜 Changelog
+
+## [1.0.0] - 2025-10-27
+### Added
+- Initial release of **twillio_android**
+- Integrated Twilio Video SDK for Android
+- Core features:
+  - Connect to Twilio Rooms
+  - Mute/unmute audio
+  - Enable/disable video
+  - Switch cameras
+  - Handle room and participant events
+- Example Flutter app
+
+### Notes
+- Android only (iOS coming soon)
+- Requires Twilio Access Token
+- Add permissions listed in README before using
