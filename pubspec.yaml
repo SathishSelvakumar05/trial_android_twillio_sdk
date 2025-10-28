@@ -1,6 +1,6 @@
 name: twillio_android
 description: "A Flutter plugin for integrating Twilio Video SDK natively on Android."
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/SathishSelvakumar05/trial_android_twillio_sdk.git
 
 

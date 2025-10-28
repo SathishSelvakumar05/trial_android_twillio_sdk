@@ -1,7 +1,8 @@
-## 1.0.0
-
-🎉 Initial release of **twillio_android**
-
+## 1.0.1
+- Fixed remote video black screen issue
+- Improved camera switch handling 
+- Handle connection and disconnected functionality
+- Updated Android Twilio callbacks
 - Native Android integration with Twilio Video SDK
 - Connect and disconnect from rooms
 - Local and remote video rendering
