@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: VideoCallScreen(
         roomName: "demo-room",
-        accessToken: "eyJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiJTSzQwNTMyOGQ4ZmY5OTk1ZTM5ZjY3MjgyYjA4MGViYWNlLTE3NjE2NjA3NDEiLCJncmFudHMiOnsidmlkZW8iOnsicm9vbSI6ImRlbW8tcm9vbSJ9LCJpZGVudGl0eSI6InVzZXIzIn0sImlzcyI6IlNLNDA1MzI4ZDhmZjk5OTVlMzlmNjcyODJiMDgwZWJhY2UiLCJleHAiOjE3NjI1MjQ3NDEsIm5iZiI6MTc2MTY2MDc0MSwic3ViIjoiQUMzYjBlMWU0YjdiZmE4ZGM5MzcxMzBhNWMxNDhiOWUyZSJ9.eq7s3XL_I7IgHchNTWpt2AcpGrm21M6o-Y5Piha8g64",
+        accessToken: "",
       ),
     );
   }
