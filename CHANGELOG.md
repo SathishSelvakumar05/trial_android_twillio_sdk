@@ -1,4 +1,4 @@
-## 1.0.1
+## 1.0.2
 - Fixed remote video black screen issue
 - Improved camera switch handling 
 - Handle connection and disconnected functionality

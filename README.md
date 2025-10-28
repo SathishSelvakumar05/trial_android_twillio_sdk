@@ -1,15 +1,14 @@
-# twillio_android
+# Twillio Android Plugin
 
-A new Flutter project.
+A Flutter plugin for Twilio Video integration on Android.
 
-## Getting Started
+## Screenshots
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+| Screenshot 1 | Screenshot 2 |
+|---------------|--------------|
+| ![Sample 1](screenshots/sample_img.jpg) | ![Sample 2](screenshots/sample2.png) |
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+## Features
+- Join / Leave Room
+- Handle Remote Participants
+- Toggle Camera, Mic, etc.

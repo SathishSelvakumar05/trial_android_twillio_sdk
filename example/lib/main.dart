@@ -5,7 +5,21 @@ import 'package:flutter/services.dart';
 import 'package:twillio_android/twillio_android.dart';
 
 void main() {
-  runApp(const VideoCallScreen(roomName: "",accessToken: "",));
+  runApp(MyApp());
+}
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: VideoCallScreen(
+        roomName: "demo-room",
+        accessToken: "eyJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiJTSzQwNTMyOGQ4ZmY5OTk1ZTM5ZjY3MjgyYjA4MGViYWNlLTE3NjE2NjA3NDEiLCJncmFudHMiOnsidmlkZW8iOnsicm9vbSI6ImRlbW8tcm9vbSJ9LCJpZGVudGl0eSI6InVzZXIzIn0sImlzcyI6IlNLNDA1MzI4ZDhmZjk5OTVlMzlmNjcyODJiMDgwZWJhY2UiLCJleHAiOjE3NjI1MjQ3NDEsIm5iZiI6MTc2MTY2MDc0MSwic3ViIjoiQUMzYjBlMWU0YjdiZmE4ZGM5MzcxMzBhNWMxNDhiOWUyZSJ9.eq7s3XL_I7IgHchNTWpt2AcpGrm21M6o-Y5Piha8g64",
+      ),
+    );
+  }
 }
 
 
@@ -64,6 +78,56 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
     }
   }
 
+  // void _listenForParticipants() {
+  //   TwillioSDK.events.listen((event) {
+  //     if (event is Map) {
+  //       final eventType = event["event"];
+  //       final identity = event["identity"];
+  //
+  //       setState(() {
+  //         switch (eventType) {
+  //           case "participant_connected":
+  //             if (!remoteParticipants.contains(identity)) {
+  //               remoteParticipants.add(identity);
+  //             }
+  //             participantAudioState[identity] = true;
+  //             participantVideoState[identity] = true;
+  //             break;
+  //
+  //           case "participant_disconnected":
+  //             remoteParticipants.remove(identity);
+  //             participantAudioState.remove(identity);
+  //             participantVideoState.remove(identity);
+  //             break;
+  //
+  //           case "audio_enabled":
+  //             participantAudioState[identity] = true;
+  //             break;
+  //
+  //           case "audio_disabled":
+  //             participantAudioState[identity] = false;
+  //             break;
+  //
+  //           case "video_enabled":
+  //             participantVideoState[identity] = true;
+  //             break;
+  //
+  //           case "video_disabled":
+  //             participantVideoState[identity] = false;
+  //             break;
+  //
+  //           case "connected":
+  //             debugPrint("✅ Room connected");
+  //             break;
+  //
+  //           case "disconnected":
+  //             debugPrint("🛑 Disconnected from room");
+  //             break;
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
   void _listenForParticipants() {
     TwillioSDK.events.listen((event) {
       if (event is Map) {
@@ -78,12 +142,24 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
               }
               participantAudioState[identity] = true;
               participantVideoState[identity] = true;
+
+              _showConnectionStatus(
+                message: "$identity joined the room",
+                color: Colors.blueAccent,
+                icon: Icons.person_add_alt_1,
+              );
               break;
 
             case "participant_disconnected":
               remoteParticipants.remove(identity);
               participantAudioState.remove(identity);
               participantVideoState.remove(identity);
+
+              _showConnectionStatus(
+                message: "$identity left the room",
+                color: Colors.redAccent,
+                icon: Icons.exit_to_app,
+              );
               break;
 
             case "audio_enabled":
@@ -101,20 +177,59 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
             case "video_disabled":
               participantVideoState[identity] = false;
               break;
-
-            case "connected":
-              debugPrint("✅ Room connected");
+            case "room_disconnected":
+            // 🟢 Handle disconnection event from native side
+              _handleRoomDisconnected(event);
+              break;
+            case "connection_failed":
+            // 🟢 Handle connection_failed event from native side for token expired etc
+              _showConnectionStatus(
+                message: "${event["error"]??"Failed to connect"}",
+                color: Colors.red,
+                icon: Icons.error_outline,
+                showToastLonger: true
+              );
               break;
 
-            case "disconnected":
-              debugPrint("🛑 Disconnected from room");
+          // 🟡 NEW: Handle network reconnecting/reconnected events
+            case "reconnecting":
+              _showConnectionStatus(
+                message: "Reconnecting... Please wait",
+                color: Colors.orangeAccent,
+                icon: Icons.wifi_off,
+                  showToastLonger:true
+              );
+              break;
+
+            case "reconnected":
+              _showConnectionStatus(
+                message: "Reconnected successfully",
+                color: Colors.greenAccent,
+                icon: Icons.wifi,
+              );
               break;
           }
         });
       }
     });
   }
+  void _handleRoomDisconnected(Map event) {
+    final roomName = event["room"];
+    print("Room disconnected: $roomName");
 
+    // Optional: show a snackbar or dialog
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Disconnected from room $roomName"),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+
+    // // Small delay so user can see the message, then pop
+    // Future.delayed(const Duration(seconds: 1), () {
+    //   if (mounted) Navigator.pop(context);
+    // });
+  }
   Future<void> _toggleAudio() async {
     if (isAudioMuted) {
       await TwillioSDK.unmuteAudio();
@@ -166,6 +281,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
+              // 🎥 Video view
               Positioned.fill(
                 child: isVideoOn
                     ? AndroidView(
@@ -175,34 +291,66 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
                 )
                     : Container(
                   color: Colors.grey[900],
-                  child: const Center(
-                    child: Icon(Icons.videocam_off, color: Colors.white54, size: 48),
+                  child: Center(
+                    child: Icon(Icons.videocam_off,
+                        color: Colors.white54, size: 48),
                   ),
                 ),
               ),
+
+              // 🧍 Participant info footer
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  color: Colors.black54,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.black54, Colors.transparent],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: Row(
                     children: [
                       Expanded(
                         child: Text(
                           identity,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Icon(isAudioOn ? Icons.mic : Icons.mic_off,
-                          color: isAudioOn ? Colors.greenAccent : Colors.redAccent),
+                      const SizedBox(width: 8),
+                      Icon(
+                        isAudioOn ? Icons.mic : Icons.mic_off,
+                        color: isAudioOn ? Colors.greenAccent : Colors.redAccent,
+                        size: 18,
+                      ),
                       const SizedBox(width: 6),
-                      Icon(isVideoOn ? Icons.videocam : Icons.videocam_off,
-                          color: isVideoOn ? Colors.greenAccent : Colors.redAccent),
+                      Icon(
+                        isVideoOn ? Icons.videocam : Icons.videocam_off,
+                        color: isVideoOn ? Colors.greenAccent : Colors.redAccent,
+                        size: 18,
+                      ),
                     ],
                   ),
                 ),
               ),
+
+              // ✨ Subtle border glow for active video
+              if (isAudioOn && isVideoOn)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.greenAccent.withOpacity(0.4), width: 1.5),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
             ],
           ),
         );
@@ -265,74 +413,51 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              _buildRemoteGrid(),
-              _buildLocalPreview(),
-              _buildControls(),
-            ],
-          ),
+    return  Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            _buildRemoteGrid(),
+            _buildLocalPreview(),
+            _buildControls(),
+          ],
         ),
+      ),);
+
+  }
+  void _showConnectionStatus({
+    required String message,
+    required Color color,
+    required IconData icon,
+    bool showToastLonger=false
+  }) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar(); // hide any existing message
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: color.withOpacity(0.9),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        duration:  Duration(seconds:showToastLonger==true?10: 3),
       ),
     );
   }
 }
 
-
-// class MyApp extends StatefulWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
-//
-// class _MyAppState extends State<MyApp> {
-//   String _platformVersion = 'Unknown';
-//   // final _twillioAndroidPlugin = TwillioAndroid();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     initPlatformState();
-//   }
-//
-//   // Platform messages are asynchronous, so we initialize in an async method.
-//   Future<void> initPlatformState() async {
-//     String platformVersion;
-//     // Platform messages may fail, so we use a try/catch PlatformException.
-//     // We also handle the message potentially returning null.
-//     try {
-//       platformVersion ="??";
-//           // await _twillioAndroidPlugin.getPlatformVersion() ?? 'Unknown platform version';
-//     } on PlatformException {
-//       platformVersion = 'Failed to get platform version.';
-//     }
-//
-//     // If the widget was removed from the tree while the asynchronous platform
-//     // message was in flight, we want to discard the reply rather than calling
-//     // setState to update our non-existent appearance.
-//     if (!mounted) return;
-//
-//     setState(() {
-//       _platformVersion = platformVersion;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Plugin example app'),
-//         ),
-//         body: Center(
-//           child: Text('Running on: $_platformVersion\n'),
-//         ),
-//       ),
-//     );
-//   }
-// }
