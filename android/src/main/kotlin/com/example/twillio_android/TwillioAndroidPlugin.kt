@@ -19,6 +19,10 @@ import io.flutter.plugin.common.StandardMessageCodec
 import tvi.webrtc.Camera2Enumerator
 
 
+import android.media.AudioManager
+
+
+
 
 
 class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
@@ -91,20 +95,33 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         LocalVideoViewFactory.pendingTrack = null
         RemoteVideoViewFactory.clearAll()
     }
+    private fun setSpeaker(enable: Boolean) {
+        val audioManager = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        audioManager.isSpeakerphoneOn = enable
+    }
+
+
 
     // Handle incoming method calls from Dart
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "connectToRoom" -> {
                 val token = call.argument<String>("token")
-                val roomName = call.argument<String>("roomName")
-                if (token.isNullOrEmpty() || roomName.isNullOrEmpty()) {
+//                val roomName = call.argument<String>("roomName")
+                if (token.isNullOrEmpty() ) {
                     result.error("ARG_NULL", "Token or RoomName is null", null)
                     return
                 }
-                connectToRoom(token, roomName)
-                result.success("Connecting to $roomName")
+                connectToRoom(token)
+                result.success("Connecting to room")
             }
+            "toggleSpeaker" -> {
+                val enable = call.argument<Boolean>("enable") ?: false
+                setSpeaker(enable)
+                result.success("Speaker ${if (enable) "ON" else "OFF"}")
+            }
+
 
             "reattachLocalVideoTrack" -> {
                 localVideoTrack?.let { LocalVideoViewFactory.currentView?.attachTrack(it) }
@@ -186,7 +203,7 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     // Connect to Twilio room helper
-    private fun connectToRoom(token: String, roomName: String) {
+    private fun connectToRoom(token: String,) {
         Handler(Looper.getMainLooper()).post {
             cameraEnumerator = Camera2Enumerator(applicationContext)
             currentCameraId = cameraEnumerator.deviceNames.firstOrNull { cameraEnumerator.isFrontFacing(it) }
@@ -216,7 +233,7 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 ?: run { LocalVideoViewFactory.pendingTrack = localVideoTrack }
 
             val connectOptions = ConnectOptions.Builder(token)
-                .roomName(roomName)
+//                .roomName(roomName)
                 .audioTracks(listOfNotNull(localAudioTrack))
                 .videoTracks(listOfNotNull(localVideoTrack))
                 .build()

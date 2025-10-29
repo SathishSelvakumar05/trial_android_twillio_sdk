@@ -15,6 +15,9 @@ class TwillioSDK {
   static Future<void> enableVideo() async => _channel.invokeMethod('enableVideo');
   static Future<void> disableVideo() async => _channel.invokeMethod('disableVideo');
   static Future<void> switchCamera() async => _channel.invokeMethod('switchCamera');
+  static Future<void> toggleSpeaker(bool enable) async {
+    await _channel.invokeMethod('toggleSpeaker', {'enable': enable});
+  }
 
   static Stream<Map<dynamic, dynamic>> get events =>
       _events.receiveBroadcastStream().cast<Map<dynamic, dynamic>>();

@@ -8,15 +8,26 @@ void main() {
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: VideoCallScreen(
-        roomName: " ",
-        accessToken: "",
+      home: Builder( // ✅ Builder gives a context under MaterialApp
+        builder: (context) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => VideoCallScreen(
+                    roomName: "demo-room",
+                    accessToken: "eyJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiJTSzQwNTMyOGQ4ZmY5OTk1ZTM5ZjY3MjgyYjA4MGViYWNlLTE3NjE3MTIyNDYiLCJncmFudHMiOnsidmlkZW8iOnsicm9vbSI6ImRlbW8tcm9vbSJ9LCJpZGVudGl0eSI6InVzZXIxIn0sImlzcyI6IlNLNDA1MzI4ZDhmZjk5OTVlMzlmNjcyODJiMDgwZWJhY2UiLCJleHAiOjE3NjE3OTg2NDYsIm5iZiI6MTc2MTcxMjI0Niwic3ViIjoiQUMzYjBlMWU0YjdiZmE4ZGM5MzcxMzBhNWMxNDhiOWUyZSJ9.nLfjn3JIDRfmI_dhM9qgaNUia25vrqFI1Pxhoc0ne_g",
+                  )),
+                );
+              },
+              child: Text("Start Call"),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -40,6 +51,8 @@ class VideoCallScreen extends StatefulWidget {
 class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingObserver {
   bool isAudioMuted = false;
   bool isVideoMuted = false;
+  bool isSpeakerOn = true;
+
 
   List<String> remoteParticipants = [];
   Map<String, bool> participantAudioState = {};
@@ -77,57 +90,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
       debugPrint("❌ Failed to connect: $e");
     }
   }
-
-  // void _listenForParticipants() {
-  //   TwillioSDK.events.listen((event) {
-  //     if (event is Map) {
-  //       final eventType = event["event"];
-  //       final identity = event["identity"];
-  //
-  //       setState(() {
-  //         switch (eventType) {
-  //           case "participant_connected":
-  //             if (!remoteParticipants.contains(identity)) {
-  //               remoteParticipants.add(identity);
-  //             }
-  //             participantAudioState[identity] = true;
-  //             participantVideoState[identity] = true;
-  //             break;
-  //
-  //           case "participant_disconnected":
-  //             remoteParticipants.remove(identity);
-  //             participantAudioState.remove(identity);
-  //             participantVideoState.remove(identity);
-  //             break;
-  //
-  //           case "audio_enabled":
-  //             participantAudioState[identity] = true;
-  //             break;
-  //
-  //           case "audio_disabled":
-  //             participantAudioState[identity] = false;
-  //             break;
-  //
-  //           case "video_enabled":
-  //             participantVideoState[identity] = true;
-  //             break;
-  //
-  //           case "video_disabled":
-  //             participantVideoState[identity] = false;
-  //             break;
-  //
-  //           case "connected":
-  //             debugPrint("✅ Room connected");
-  //             break;
-  //
-  //           case "disconnected":
-  //             debugPrint("🛑 Disconnected from room");
-  //             break;
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
   void _listenForParticipants() {
     TwillioSDK.events.listen((event) {
       if (event is Map) {
@@ -194,7 +156,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
           // 🟡 NEW: Handle network reconnecting/reconnected events
             case "reconnecting":
               _showConnectionStatus(
-                message: "Reconnecting... Please wait",
+                message: "Network issue... Please wait",
                 color: Colors.orangeAccent,
                 icon: Icons.wifi_off,
                   showToastLonger:true
@@ -225,10 +187,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
       ),
     );
 
-    // // Small delay so user can see the message, then pop
-    // Future.delayed(const Duration(seconds: 1), () {
-    //   if (mounted) Navigator.pop(context);
-    // });
+    // Small delay so user can see the message, then pop
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) Navigator.pop(context);
+    });
   }
   Future<void> _toggleAudio() async {
     if (isAudioMuted) {
@@ -237,6 +199,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
       await TwillioSDK.muteAudio();
     }
     setState(() => isAudioMuted = !isAudioMuted);
+  }
+  Future<void> _toggleSpeaker() async {
+    await TwillioSDK.toggleSpeaker(isSpeakerOn);
+
+    setState(() => isSpeakerOn = !isSpeakerOn);
   }
 
   Future<void> _toggleVideo() async {
@@ -363,13 +330,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
       bottom: 110,
       right: 10,
       child: Container(
+        padding: EdgeInsets.all(2),
         height: 160,
         width: 120,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 1),
-          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: !remoteParticipants.isNotEmpty?Colors.green:Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(4),
         ),
-        child: AndroidView(
+        child: AndroidView(clipBehavior: Clip.antiAliasWithSaveLayer,
           viewType: "LocalVideoView",
           creationParams: const {},
           creationParamsCodec: const StandardMessageCodec(),
@@ -386,6 +354,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+
+          _buildControlButton(Icons.volume_up, _toggleSpeaker, isActive: isSpeakerOn, activeColor: Colors.blue),
           _buildControlButton(Icons.mic, _toggleAudio, isActive: isAudioMuted, activeColor: Colors.redAccent),
           _buildControlButton(Icons.videocam, _toggleVideo, isActive: isVideoMuted, activeColor: Colors.orangeAccent),
           _buildControlButton(Icons.switch_camera, _switchCamera, activeColor: Colors.blueAccent),
