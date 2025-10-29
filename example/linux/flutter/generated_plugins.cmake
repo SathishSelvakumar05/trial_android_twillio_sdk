@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  twillio_android
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

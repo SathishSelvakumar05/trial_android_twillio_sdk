@@ -1,6 +1,6 @@
 name: twillio_android
 description: "A Flutter plugin for integrating Twilio Video SDK natively on Android."
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/SathishSelvakumar05/trial_android_twillio_sdk.git
 
 
@@ -43,20 +43,12 @@ flutter:
         pluginClass: TwillioAndroidPlugin
       ios:
         pluginClass: TwillioAndroidPlugin
-      linux:
-        pluginClass: TwillioAndroidPlugin
-      macos:
-        pluginClass: TwillioAndroidPlugin
-      windows:
-        pluginClass: TwillioAndroidPluginCApi
-      web:
-        pluginClass: TwillioAndroidWeb
-        fileName: twillio_android_web.dart
+
 
   # To add assets to your plugin package, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+    assets:
+     - screenshots/sample_img.jpg
+     - screenshots/sample2.png
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/to/asset-from-package

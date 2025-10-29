@@ -66,7 +66,7 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         binding.platformViewRegistry.registerViewFactory("LocalVideoView", LocalVideoViewFactory())
         binding.platformViewRegistry.registerViewFactory("RemoteVideoView", RemoteVideoViewFactory())
     }
-
+//Cleans up everything when plugin is removed.
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         // Clean up
         methodChannel?.setMethodCallHandler(null)
