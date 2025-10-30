@@ -1,5 +1,5 @@
-## 1.0.3
-- Fixed remote video black screen issue
+## 1.0.4
+- Added Speaker Functionality
 - Improved camera switch handling 
 - Handle connection and disconnected functionality
 - Updated Android Twilio callbacks

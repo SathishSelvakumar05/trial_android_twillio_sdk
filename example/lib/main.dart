@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Builder( // ✅ Builder gives a context under MaterialApp
+      home: Builder(
         builder: (context) => Scaffold(
           body: Center(
             child: ElevatedButton(
@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => VideoCallScreen(
-                    roomName: "demo-room",
-                    accessToken: "eyJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIiwidHlwIjoiSldUIn0.eyJqdGkiOiJTSzQwNTMyOGQ4ZmY5OTk1ZTM5ZjY3MjgyYjA4MGViYWNlLTE3NjE3MTIyNDYiLCJncmFudHMiOnsidmlkZW8iOnsicm9vbSI6ImRlbW8tcm9vbSJ9LCJpZGVudGl0eSI6InVzZXIxIn0sImlzcyI6IlNLNDA1MzI4ZDhmZjk5OTVlMzlmNjcyODJiMDgwZWJhY2UiLCJleHAiOjE3NjE3OTg2NDYsIm5iZiI6MTc2MTcxMjI0Niwic3ViIjoiQUMzYjBlMWU0YjdiZmE4ZGM5MzcxMzBhNWMxNDhiOWUyZSJ9.nLfjn3JIDRfmI_dhM9qgaNUia25vrqFI1Pxhoc0ne_g",
+                    roomName: "",
+                    accessToken: "",
                   )),
                 );
               },
