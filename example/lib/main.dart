@@ -19,8 +19,7 @@ class MyApp extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (_) => VideoCallScreen(
                     roomName: "",
-                    accessToken: "",
-                  )),
+                    accessToken: "",)),
                 );
               },
               child: Text("Start Call"),
