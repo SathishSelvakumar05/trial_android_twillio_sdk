@@ -45,6 +45,9 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private lateinit var cameraEnumerator: Camera2Enumerator
     private var currentCameraId: String? = null
 
+    private val mainHandler = Handler(Looper.getMainLooper()) // ✅ Add this
+
+
     // Lifecycle - attach to engine
     override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         applicationContext = binding.applicationContext
@@ -259,33 +262,73 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             Log.e("Twilio", "Connection failed: ${e.message}")
             eventSink?.success(mapOf("event" to "connection_failed", "error" to e.message))
         }
-
         override fun onDisconnected(room: Room, e: TwilioException?) {
             Log.i("Twilio", "Disconnected from room")
 
-            room.remoteParticipants.forEach { it.setListener(null) }
+            // 🔹 DO NOT call setListener(null) — Twilio doesn't allow null listeners.
+            // Instead, let Twilio clean them up internally.
+            room.remoteParticipants.forEach { participant ->
+                Log.i("Twilio", "Remote participant ${participant.identity} disconnected")
+            }
 
+            // 🔹 Release local video track
             localVideoTrack?.let { track ->
                 LocalVideoViewFactory.currentView?.detachTrack(track)
                 track.release()
                 localVideoTrack = null
             }
 
+            // 🔹 Release local audio track
             localAudioTrack?.release()
             localAudioTrack = null
 
-            cameraCapturer?.stopCapture()
+            // 🔹 Stop camera capture safely
+            try {
+                cameraCapturer?.stopCapture()
+            } catch (ex: Exception) {
+                Log.w("Twilio", "Error stopping camera capture: ${ex.message}")
+            }
             cameraCapturer = null
 
+            // 🔹 Reset view factories and room reference
             LocalVideoViewFactory.currentView = null
             LocalVideoViewFactory.pendingTrack = null
-
             RemoteVideoViewFactory.clearAll()
-
             this@TwillioAndroidPlugin.room = null
 
-            eventSink?.success(mapOf("event" to "room_disconnected", "room" to room.name))
+            // 🔹 Notify Flutter side
+            mainHandler.post {
+                eventSink?.success(mapOf("event" to "room_disconnected", "room" to room.name))
+            }
         }
+
+
+//        override fun onDisconnected(room: Room, e: TwilioException?) {
+//            Log.i("Twilio", "Disconnected from room")
+//
+//            room.remoteParticipants.forEach { it.setListener(null) }
+//
+//            localVideoTrack?.let { track ->
+//                LocalVideoViewFactory.currentView?.detachTrack(track)
+//                track.release()
+//                localVideoTrack = null
+//            }
+//
+//            localAudioTrack?.release()
+//            localAudioTrack = null
+//
+//            cameraCapturer?.stopCapture()
+//            cameraCapturer = null
+//
+//            LocalVideoViewFactory.currentView = null
+//            LocalVideoViewFactory.pendingTrack = null
+//
+//            RemoteVideoViewFactory.clearAll()
+//
+//            this@TwillioAndroidPlugin.room = null
+//
+//            eventSink?.success(mapOf("event" to "room_disconnected", "room" to room.name))
+//        }
 
         override fun onParticipantConnected(room: Room, participant: RemoteParticipant) {
             participant.setListener(remoteParticipantListener)

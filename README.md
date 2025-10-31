@@ -2,20 +2,28 @@
 
 A Flutter plugin for Twilio Video integration on Android.
 
-## Screenshots
+## 📸 Screenshots
 
 | Screenshot 1 | Screenshot 2 |
 |---------------|--------------|
-| ![Sample 1](screenshots/sample.webp) | ![Sample 2](screenshots/sample2.png) |
+| ![Sample 1](screenshots/video_img.jpg) | ![Sample 2](screenshots/video_img2.jpg) |
 
-## Features
+## 🚀 Features
 - Join / Leave Room
 - Handle Remote Participants
-- Toggle Camera, Mic, etc.
+- Toggle Camera, Mic, Speaker, etc.
 
-## ⚙️ Required Android Permissions
+---
 
-Make sure to add the following permissions inside your **`AndroidManifest.xml`** file:
+## 🧩 Permissions
+
+Make sure to add the following permissions in your **Android** and **iOS** projects.
+
+---
+
+### 🟢 Android Permissions
+
+Add these lines inside your **`android/app/src/main/AndroidManifest.xml`** file:
 
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />

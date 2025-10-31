@@ -5,8 +5,8 @@ class TwillioSDK {
   static const MethodChannel _channel = MethodChannel('twilio_video');
   static const EventChannel _events = EventChannel('twilio_video_events');
 
-  static Future<void> connect(String token, String room) async {
-    await _channel.invokeMethod('connectToRoom', {'token': token, 'roomName': room});
+  static Future<void> connect(String token,) async {
+    await _channel.invokeMethod('connectToRoom', {'token': token});
   }
 
   static Future<void> disconnect() async => _channel.invokeMethod('disconnect');

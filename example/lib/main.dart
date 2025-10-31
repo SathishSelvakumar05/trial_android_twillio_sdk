@@ -18,7 +18,6 @@ class MyApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => VideoCallScreen(
-                    roomName: "",
                     accessToken: "",)),
                 );
               },
@@ -34,12 +33,10 @@ class MyApp extends StatelessWidget {
 
 class VideoCallScreen extends StatefulWidget {
   final String accessToken;
-  final String roomName;
 
   const VideoCallScreen({
     super.key,
     required this.accessToken,
-    required this.roomName,
   });
 
   @override
@@ -82,8 +79,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
 
   Future<void> _connectToRoom() async {
     try {
-      await TwillioSDK.connect(widget.accessToken, widget.roomName);
-      debugPrint("✅ Connected to room: ${widget.roomName}");
+      await TwillioSDK.connect(widget.accessToken);
+      debugPrint("✅ Connected to room");
     } catch (e) {
       debugPrint("❌ Failed to connect: $e");
     }
