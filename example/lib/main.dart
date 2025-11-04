@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => VideoCallScreen(
-                    accessToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTSzkwN2JmNmUyMzhlZDJmY2RmNDk5MTk1OTkzNmI4YjNkLTE3NjIyNDE1OTQiLCJncmFudHMiOnsidmlkZW8iOnsicm9vbSI6IlNERFBST0QzNjlDQVNFIn0sImlkZW50aXR5IjoiODEyNDI2MjgxOSJ9LCJpc3MiOiJTSzkwN2JmNmUyMzhlZDJmY2RmNDk5MTk1OTkzNmI4YjNkIiwibmJmIjoxNzYyMjQxNTk0LCJleHAiOjE3NjIyNDUxOTQsInN1YiI6IkFDMTQ2MjMwMWMyOTI2NTk5MWU4YThlYzY5OWJkMWQxZjIifQ.AnkmLG59Xu8w6FAqzEIJocX6WywLNaybK_rpTMJkJoc",)),
+                    accessToken: "",)),
                 );
               },
               child: Text("Start Call"),
