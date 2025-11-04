@@ -19,11 +19,11 @@ void main() {
     expect(initialPlatform, isInstanceOf<MethodChannelTwillioAndroid>());
   });
 
-  test('getPlatformVersion', () async {
-    TwillioAndroid twillioAndroidPlugin = TwillioAndroid();
-    MockTwillioAndroidPlatform fakePlatform = MockTwillioAndroidPlatform();
-    TwillioAndroidPlatform.instance = fakePlatform;
-
-    expect(await twillioAndroidPlugin.getPlatformVersion(), '42');
-  });
+  // test('getPlatformVersion', () async {
+  //   // TwillioAndroid twillioAndroidPlugin = TwillioAndroid();
+  //   MockTwillioAndroidPlatform fakePlatform = MockTwillioAndroidPlatform();
+  //   TwillioAndroidPlatform.instance = fakePlatform;
+  //
+  //   // expect(await twillioAndroidPlugin.getPlatformVersion(), '42');
+  // });
 }

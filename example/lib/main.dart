@@ -125,8 +125,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
             case "audio_enabled":
               participantAudioState[identity] = true;
               break;
-
-            case "audio_disabled":
+            case "roomConnected":
+              _showConnectionStatus(
+                message: "Connected",
+                color: Colors.green,
+                icon: Icons.login,
+              );
+              break;
+              case "audio_disabled":
               participantAudioState[identity] = false;
               break;
 
@@ -180,7 +186,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
     // Optional: show a snackbar or dialog
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Disconnected from room $roomName"),
+        content: Text("Disconnected"),
         backgroundColor: Colors.redAccent,
       ),
     );
@@ -244,6 +250,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
         final identity = remoteParticipants[index];
         final isAudioOn = participantAudioState[identity] ?? true;
         final isVideoOn = participantVideoState[identity] ?? true;
+        print("is Vediooo");
+        print("${isVideoOn}");
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(16),
@@ -338,11 +346,19 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
           border: Border.all(color: !remoteParticipants.isNotEmpty?Colors.green:Colors.white, width: 1),
           borderRadius: BorderRadius.circular(4),
         ),
-        child: AndroidView(clipBehavior: Clip.antiAliasWithSaveLayer,
+        child:
+        !isVideoMuted?
+
+        AndroidView(clipBehavior: Clip.antiAliasWithSaveLayer,
           viewType: "LocalVideoView",
           creationParams: const {},
           creationParamsCodec: const StandardMessageCodec(),
-        ),
+        ):Container(
+            color: Colors.grey[900],
+            child: Center(
+              child: Icon(Icons.videocam_off,
+                  color: Colors.white54, size: 48),
+            )),
       ),
     );
   }

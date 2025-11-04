@@ -17,13 +17,7 @@ import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 import io.flutter.plugin.common.StandardMessageCodec
 import tvi.webrtc.Camera2Enumerator
-
-
 import android.media.AudioManager
-
-
-
-
 
 class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     companion object {
@@ -118,6 +112,7 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 }
                 connectToRoom(token)
                 result.success("Connecting to room")
+
             }
             "toggleSpeaker" -> {
                 val enable = call.argument<Boolean>("enable") ?: false
@@ -171,14 +166,6 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 result.success(null)
             }
 
-//            "disableVideo" -> {
-//                localVideoTrack?.let { track ->
-//                    LocalVideoViewFactory.currentView?.detachTrack(track)
-//                    track.release()
-//                    localVideoTrack = null
-//                }
-//                result.success(null)
-//            }
             "disableVideo" -> {
                 localVideoTrack?.let { track ->
                     LocalVideoViewFactory.currentView?.detachTrack(track)
@@ -203,25 +190,6 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
                 result.success(null)
             }
-
-
-//
-//            "enableVideo" -> {
-//                if (!::cameraEnumerator.isInitialized || cameraCapturer == null) {
-//                    result.error("NO_CAPTURER", "CameraCapturer is null", null)
-//                    return
-//                }
-//
-//                localVideoTrack = LocalVideoTrack.create(applicationContext, true, cameraCapturer!!)
-//                LocalVideoViewFactory.currentView?.attachTrack(localVideoTrack!!)
-//
-//                room?.localParticipant?.let { participant ->
-//                    participant.publishTrack(localVideoTrack!!)
-//                }
-//
-//                result.success(null)
-//            }
-
             "disconnect" -> {
                 room?.disconnect()
                 result.success(null)
@@ -277,9 +245,13 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         override fun onConnected(room: Room) {
             room.localParticipant?.setListener(localParticipantListener)
             Log.i("Twilio", "Connected to room: ${room.name}")
+            eventSink?.success(mapOf("event" to "roomConnected", "msg" to "Connected"))
+
 
             room.remoteParticipants.forEach { participant ->
                 participant.setListener(remoteParticipantListener)
+                Log.e("Twilio", "Connection participant_connected: from initial connection")
+
                 eventSink?.success(mapOf("event" to "participant_connected", "identity" to participant.identity))
             }
         }
@@ -327,34 +299,6 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 eventSink?.success(mapOf("event" to "room_disconnected", "room" to room.name))
             }
         }
-
-
-//        override fun onDisconnected(room: Room, e: TwilioException?) {
-//            Log.i("Twilio", "Disconnected from room")
-//
-//            room.remoteParticipants.forEach { it.setListener(null) }
-//
-//            localVideoTrack?.let { track ->
-//                LocalVideoViewFactory.currentView?.detachTrack(track)
-//                track.release()
-//                localVideoTrack = null
-//            }
-//
-//            localAudioTrack?.release()
-//            localAudioTrack = null
-//
-//            cameraCapturer?.stopCapture()
-//            cameraCapturer = null
-//
-//            LocalVideoViewFactory.currentView = null
-//            LocalVideoViewFactory.pendingTrack = null
-//
-//            RemoteVideoViewFactory.clearAll()
-//
-//            this@TwillioAndroidPlugin.room = null
-//
-//            eventSink?.success(mapOf("event" to "room_disconnected", "room" to room.name))
-//        }
 
         override fun onParticipantConnected(room: Room, participant: RemoteParticipant) {
             participant.setListener(remoteParticipantListener)
@@ -437,12 +381,6 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 }
                 RemoteVideoViewFactory.attachTrack(p.identity, track)
             }
-
-//            Handler(Looper.getMainLooper()).post {
-//                RemoteVideoViewFactory.detachAllForParticipant(p.identity) // 🧩 clear old stale sinks
-//
-//                RemoteVideoViewFactory.attachTrack(p.identity, track)
-//            }
             eventSink?.success(mapOf("event" to "video_enabled", "identity" to p.identity))
         }
 
@@ -479,17 +417,6 @@ class TwillioAndroidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             eventSink?.success(mapOf("event" to "audio_disabled", "identity" to p.identity))
         }
 
-//        override fun onVideoTrackEnabled(p: RemoteParticipant, pub: RemoteVideoTrackPublication) {
-//            Log.i("Twilio", "Remote video subscribed: ${p.identity}")
-//
-//            eventSink?.success(mapOf("event" to "video_enabled", "identity" to p.identity))
-//        }
-
-//        override fun onVideoTrackDisabled(p: RemoteParticipant, pub: RemoteVideoTrackPublication) {
-//            Log.i("Twilio", "Remote video disable: ${p.identity}")
-//
-//            eventSink?.success(mapOf("event" to "video_disabled", "identity" to p.identity))
-//        }
 override fun onVideoTrackEnabled(p: RemoteParticipant, pub: RemoteVideoTrackPublication) {
     Log.i("Twilio", "Remote video enabled for: ${p.identity}")
 
@@ -542,13 +469,20 @@ override fun onVideoTrackEnabled(p: RemoteParticipant, pub: RemoteVideoTrackPubl
             p: RemoteParticipant,
             pub: RemoteAudioTrackPublication,
             e: TwilioException
-        ) {}
+        ) {
+            Log.e("Twilio", "Error onAudioTrackSubscriptionFailed")
+
+        }
 
         override fun onVideoTrackSubscriptionFailed(
             p: RemoteParticipant,
             pub: RemoteVideoTrackPublication,
             e: TwilioException
-        ) {}
+        ) {
+            Log.e("Twilio", "Error onVideoTrackSubscriptionFailed")
+
+        }
+
 
         override fun onDataTrackSubscriptionFailed(
             p: RemoteParticipant,
@@ -663,7 +597,6 @@ class RemoteVideoViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE
 
         fun detachAllForParticipant(identity: String) {
             remoteViews.remove(identity)
-//            pendingTracks.remove(identity)
         }
         fun hasViewFor(identity: String): Boolean {
             return remoteViews.containsKey(identity)
