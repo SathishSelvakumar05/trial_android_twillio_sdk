@@ -6,7 +6,7 @@ A Flutter plugin for Twilio Video integration on Android.
 
 | Screenshot 1 | Screenshot 2 |
 |---------------|--------------|
-| ![Sample 1](screenshots/video_img.jpg) | ![Sample 2](screenshots/video_img2.jpg) |
+| ![Sample 1](screenshots/video_img.jpg) | ![Sample 2](screenshots/sample3.png) |
 
 ## 🚀 Features
 - Join / Leave Room

@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => VideoCallScreen(
-                    accessToken: "",)),
+                    accessToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTSzkwN2JmNmUyMzhlZDJmY2RmNDk5MTk1OTkzNmI4YjNkLTE3NjIyNDE1OTQiLCJncmFudHMiOnsidmlkZW8iOnsicm9vbSI6IlNERFBST0QzNjlDQVNFIn0sImlkZW50aXR5IjoiODEyNDI2MjgxOSJ9LCJpc3MiOiJTSzkwN2JmNmUyMzhlZDJmY2RmNDk5MTk1OTkzNmI4YjNkIiwibmJmIjoxNzYyMjQxNTk0LCJleHAiOjE3NjIyNDUxOTQsInN1YiI6IkFDMTQ2MjMwMWMyOTI2NTk5MWU4YThlYzY5OWJkMWQxZjIifQ.AnkmLG59Xu8w6FAqzEIJocX6WywLNaybK_rpTMJkJoc",)),
                 );
               },
               child: Text("Start Call"),
@@ -46,7 +46,9 @@ class VideoCallScreen extends StatefulWidget {
 class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingObserver {
   bool isAudioMuted = false;
   bool isVideoMuted = false;
-  bool isSpeakerOn = true;
+  bool isFrontCamera = true;
+  bool isSpeakerOn = false;
+
 
 
   List<String> remoteParticipants = [];
@@ -99,7 +101,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
               }
               participantAudioState[identity] = true;
               participantVideoState[identity] = true;
-
+              print("neww onee");
+              print("neww onee  $identity");
               _showConnectionStatus(
                 message: "$identity joined the room",
                 color: Colors.blueAccent,
@@ -212,6 +215,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
 
   Future<void> _switchCamera() async {
     await TwillioSDK.switchCamera();
+    setState(() => isFrontCamera = !isFrontCamera);
+
+
   }
 
   Future<void> _endCall() async {
@@ -350,10 +356,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
 
-          _buildControlButton(Icons.volume_up, _toggleSpeaker, isActive: isSpeakerOn, activeColor: Colors.blue),
-          _buildControlButton(Icons.mic, _toggleAudio, isActive: isAudioMuted, activeColor: Colors.redAccent),
-          _buildControlButton(Icons.videocam, _toggleVideo, isActive: isVideoMuted, activeColor: Colors.orangeAccent),
-          _buildControlButton(Icons.switch_camera, _switchCamera, activeColor: Colors.blueAccent),
+          _buildControlButton(Icons.volume_up, _toggleSpeaker, isActive: !isSpeakerOn, activeColor: Colors.blue),
+          _buildControlButton(isAudioMuted?Icons.mic_off:Icons.mic, _toggleAudio, isActive: isAudioMuted, activeColor: Colors.redAccent),
+          _buildControlButton(isVideoMuted?Icons.videocam_off:Icons.videocam, _toggleVideo, isActive: isVideoMuted, activeColor: Colors.orangeAccent),
+          _buildControlButton( isFrontCamera? Icons.camera_front_outlined : Icons.camera_rear_outlined, _switchCamera, activeColor:Colors.lightBlueAccent,isActive: isFrontCamera),
           _buildControlButton(Icons.call_end, _endCall, activeColor: Colors.red, isActive: true),
         ],
       ),
