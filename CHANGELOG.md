@@ -1,4 +1,5 @@
-## 1.0.6
+## 1.1.0
+- Improved Remote Participants Performance
 - support   sdk: '>=3.4.3 <4.0.0' (you can change based on your needs)
 - Added Speaker Functionality
 - Improved camera switch handling 

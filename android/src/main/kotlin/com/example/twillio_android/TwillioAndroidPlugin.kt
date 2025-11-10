@@ -479,7 +479,7 @@ override fun onVideoTrackEnabled(p: RemoteParticipant, pub: RemoteVideoTrackPubl
             pub: RemoteVideoTrackPublication,
             e: TwilioException
         ) {
-            Log.e("Twilio", "Error onVideoTrackSubscriptionFailed")
+            Log.e("Twilio", "Error onAudioTrackSubscriptionFailed")
 
         }
 

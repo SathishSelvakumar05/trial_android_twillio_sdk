@@ -99,10 +99,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
               if (!remoteParticipants.contains(identity)) {
                 remoteParticipants.add(identity);
               }
-              participantAudioState[identity] = true;
-              participantVideoState[identity] = true;
+              participantAudioState[identity] = false;
+              participantVideoState[identity] = false;
               print("neww onee");
               print("neww onee  $identity");
+              print("neww onee  ${participantVideoState[identity]}");
               _showConnectionStatus(
                 message: "$identity joined the room",
                 color: Colors.blueAccent,
@@ -249,7 +250,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
       itemBuilder: (context, index) {
         final identity = remoteParticipants[index];
         final isAudioOn = participantAudioState[identity] ?? true;
-        final isVideoOn = participantVideoState[identity] ?? true;
+        final isVideoOn = participantVideoState[identity] ?? false;
         print("is Vediooo");
         print("${isVideoOn}");
 
@@ -259,8 +260,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
             children: [
               // 🎥 Video view
               Positioned.fill(
-                child: isVideoOn
-                    ? AndroidView(
+                child:
+                isVideoOn ?
+
+                AndroidView(
                   viewType: "RemoteVideoView",
                   creationParams: {"identity": identity},
                   creationParamsCodec: const StandardMessageCodec(),
@@ -347,18 +350,19 @@ class _VideoCallScreenState extends State<VideoCallScreen> with WidgetsBindingOb
           borderRadius: BorderRadius.circular(4),
         ),
         child:
-        !isVideoMuted?
+        // !isVideoMuted?
 
         AndroidView(clipBehavior: Clip.antiAliasWithSaveLayer,
           viewType: "LocalVideoView",
           creationParams: const {},
           creationParamsCodec: const StandardMessageCodec(),
-        ):Container(
-            color: Colors.grey[900],
-            child: Center(
-              child: Icon(Icons.videocam_off,
-                  color: Colors.white54, size: 48),
-            )),
+        )
+            //   :Container(
+            // color: Colors.grey[900],
+            // child: Center(
+            //   child: Icon(Icons.videocam_off,
+            //       color: Colors.white54, size: 48),
+            // )),
       ),
     );
   }
